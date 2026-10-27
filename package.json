@@ -1,0 +1,22 @@
+{
+  "name": "js-vm-code-mmo69-com",
+  "version": "1.0.0",
+  "description": "NodeJS SDK for the JsVM.MMO69.Com VMCode API — protect JavaScript with server-side TNVM VM bytecode (async task: submit → taskId → poll).",
+  "type": "module",
+  "main": "index.mjs",
+  "exports": {
+    ".": "./index.mjs"
+  },
+  "files": [
+    "index.mjs",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "javascript", "obfuscator", "vm", "protect", "bytecode", "tnvm", "jsvm", "mmo69"
+  ],
+  "homepage": "https://JsVM.MMO69.Com",
+  "license": "MIT"
+}
