@@ -1,4 +1,4 @@
-// js-vm-code-mmo69-com — NodeJS SDK gọi API bảo vệ mã JsVM.MMO69.Com (TNVM VMCode).
+// vmcode — NodeJS SDK gọi API bảo vệ mã JsVM.MMO69.Com (TNVM VMCode).
 // API chạy async kiểu giải captcha: POST /api/vm → {taskId} → poll POST /api/vm/result.
 // Cần API key (tnvm_…, gói Pro+) — tạo tại https://JsVM.MMO69.Com/client/apikeys.html
 // Zero dependency — chỉ dùng fetch có sẵn của Node ≥ 18 (response gzip tự giải nén).

@@ -1,4 +1,4 @@
-# js-vm-code-mmo69-com
+# vmcode
 
 NodeJS SDK for the **JsVM.MMO69.Com** VMCode protection API — compile plain
 JavaScript into server-side TNVM **VM bytecode** without shipping the engine
@@ -14,14 +14,14 @@ to the browser.
 ## Install
 
 ```bash
-npm i js-vm-code-mmo69-com
+npm i vmcode
 # hoặc chỉ copy index.mjs — cả thư viện gói gọn trong 1 file
 ```
 
 ## Quick start
 
 ```js
-import { VmCode } from 'js-vm-code-mmo69-com';
+import { VmCode } from 'vmcode';
 import fs from 'node:fs';
 
 const vm = new VmCode({ apiKey: 'tnvm_YOUR_KEY' });
@@ -75,7 +75,7 @@ Mọi lỗi đều throw `VmError` — `err.code` khớp mã lỗi API:
 ## Dùng nhanh (Tiếng Việt)
 
 ```js
-import { VmCode } from 'js-vm-code-mmo69-com';
+import { VmCode } from 'vmcode';
 const vm = new VmCode({ apiKey: 'tnvm_CUA_BAN' }); // cần gói Pro+
 const { result } = await vm.protect('function f(x){ return x*3+1; }', { preset: 'low' });
 console.log(result); // mã đã được bảo vệ — chạy y hệt bản gốc
