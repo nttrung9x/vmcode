@@ -1,51 +1,51 @@
 # vmcode
 
-> 🇻🇳 Tiếng Việt • [🇬🇧 English](README_EN.md)
+> [🇻🇳 Tiếng Việt](README_VI.md) • 🇬🇧 English
 
-SDK NodeJS cho API bảo vệ mã **JsVM.MMO69.Com** (TNVM VMCode) — biên dịch
-JavaScript thường thành **VM bytecode** xử lý bên server, không ship engine ra
-trình duyệt.
+NodeJS SDK for the **JsVM.MMO69.Com** VMCode protection API — compile plain
+JavaScript into server-side TNVM **VM bytecode** without shipping the engine
+to the browser.
 
-- **API bất đồng bộ** kiểu captcha-solver: submit → `taskId` → poll — sinh ra
-  cho file lớn và preset chậm
-- **Zero dependencies** (Node ≥ 18, dùng `fetch` có sẵn)
-- **gzip upload** cho payload lớn
-- Cần **API key** (`tnvm_…`, gói Pro trở lên) — tạo tại
+- **Async task API** (captcha-solver style): submit → `taskId` → poll — made
+  for large files and slow presets
+- **Zero dependencies** (Node ≥ 18, built-in `fetch`)
+- **gzip uploads** for large payloads
+- Needs an **API key** (`tnvm_…`, Pro plan or higher) — create one at
   <https://JsVM.MMO69.Com/client/apikeys.html>
 
-## Cài đặt
+## Install
 
 ```bash
 npm i vmcode
-# hoặc chỉ copy index.mjs — cả thư viện gói gọn trong 1 file
+# or just copy index.mjs — the whole library is a single file
 ```
 
-## Dùng nhanh
+## Quick start
 
 ```js
 import { VmCode } from 'vmcode';
 import fs from 'node:fs';
 
-const vm = new VmCode({ apiKey: 'tnvm_CUA_BAN' });
+const vm = new VmCode({ apiKey: 'tnvm_YOUR_KEY' });
 
 const out = await vm.protect(
   fs.readFileSync('src/app.js', 'utf8'),
   { preset: 'medium', target: 'node' },
 );
 fs.writeFileSync('app.protected.js', out.result);
-console.log(`Xong sau ${out.elapsed}ms — đã dùng ${out.usage?.bytes}/${out.usage?.quotaMB}MB`);
+console.log(`Done in ${out.elapsed}ms — quota used: ${out.usage?.bytes}/${out.usage?.quotaMB}MB`);
 ```
 
-Hoặc inline 1 hàm:
+Or protect a single function inline:
 
 ```js
 const { result } = await vm.protect('function f(x){ return x*3+1; }', { preset: 'low' });
-console.log(result); // mã đã bảo vệ — chạy y hệt bản gốc
+console.log(result); // protected code — runs exactly like the original
 ```
 
-## Preset
+## Presets
 
-| Option (thứ tự trong bảng ở dưới) | `low` | `medium` | `max` |
+| Option (order matches the tables below) | `low` | `medium` | `max` |
 |---|:---:|:---:|:---:|
 | `targetMode` | `root` | `root` | `root` |
 | `preprocessIdentifiers` | – | ✓ | ✓ |
@@ -70,125 +70,128 @@ console.log(result); // mã đã bảo vệ — chạy y hệt bản gốc
 | `semanticOpacity` | – | – | ✓ |
 | `observationResistance` | – | – | ✓ |
 
-- **`low`** *(mặc định)* — nhanh nhất, chỉ `dynamicOpcodes`: bytecode VM thuần,
-  output gọn. File 122KB ~vài trăm ms.
-- **`medium`** — cân bằng: 9/21 option bật. File 122KB ~3s.
-- **`max`** — tất cả 21 option. Mạnh nhất nhưng chậm — **thời gian tăng theo
-  SỐ HÀM**, file nhiều hàm (800+) có thể mất vài phút; tăng `timeoutMs` khi dùng.
+- **`low`** *(default)* — fastest, only `dynamicOpcodes`: plain VM bytecode,
+  compact output. A 122KB file takes ~a few hundred ms.
+- **`medium`** — balanced: 9/21 options on. A 122KB file takes ~3s.
+- **`max`** — all 21 options. Strongest but slow — **cost scales with
+  FUNCTION COUNT**; a many-function file (800+) can take minutes — raise
+  `timeoutMs` when using it.
 
-**Auto-enable** (engine tự bật kèm, không cần khai báo):
-bật `integrityBinding` / `vmShielding` / `opcodeMutation` / `incrementalCipher` /
-`observationResistance` → tự bật `rollingCipher`; bật `stringAtomization` → tự
-bật `polymorphicDecoder`.
+**Auto-enable** (the engine turns these on by itself, no need to declare):
+enabling `integrityBinding` / `vmShielding` / `opcodeMutation` /
+`incrementalCipher` / `observationResistance` → auto-enables `rollingCipher`;
+enabling `stringAtomization` → auto-enables `polymorphicDecoder`.
 
-## Tuỳ chọn engine (options)
+## Engine options
 
-Truyền vào tham số thứ 2 của `submit()` / `protect()`. **Boolean chỉ có tác
-dụng BẬT THÊM** ngoài preset (server chỉ nhận `true` — không thể tắt option mà
-preset đã bật):
+Pass as the second argument of `submit()` / `protect()`. Booleans only work
+as **opt-IN additions** to the preset (the server only accepts `true` — you
+cannot turn off an option the preset already enables):
 
 ```js
 await vm.protect(code, {
-  preset: 'medium',            // low | medium | max (mặc định low)
-  targetMode: 'comment',       // root (mặc định) | comment — Pro+
-  target: 'node',              // browser (mặc định) | node — Pro+
-  rollingCipher: true,         // bật THÊM option ngoài preset
-  vmShielding: true,           // → tự bật rollingCipher kèm theo
+  preset: 'medium',            // low | medium | max (default low)
+  targetMode: 'comment',       // root (default) | comment — Pro+
+  target: 'node',              // browser (default) | node — Pro+
+  rollingCipher: true,         // turn an extra option ON top of the preset
+  vmShielding: true,           // → rollingCipher comes along automatically
 });
 ```
 
 ### `targetMode`
 
-- **`root`** *(mặc định)* — bảo vệ TOÀN BỘ hàm top-level của file
-- **`comment`** *(Pro+)* — chỉ bảo vệ hàm có comment đánh dấu ngay phía trên:
+- **`root`** *(default)* — protects ALL top-level functions of the file
+- **`comment`** *(Pro+)* — only protects functions marked by a leading comment:
   ```js
   // tnvm:vm
-  function secret(a, b) { /* chỉ hàm này được VM hoá */ }
+  function secret(a, b) { /* only this function gets VM-compiled */ }
   ```
 
 ### `target`
 
-- **`browser`** *(mặc định)* — output chạy trong trình duyệt
-- **`node`** *(Pro+)* — output chạy trong NodeJS
+- **`browser`** *(default)* — output runs in the browser
+- **`node`** *(Pro+)* — output runs in NodeJS
 
-### Bảo mật (Security)
+### Security
 
-| Option | Mô tả |
+| Option | Description |
 |---|---|
-| `rollingCipher` | Mã hoá XOR phụ thuộc vị trí trên từng instruction |
-| `integrityBinding` | Ràng buộc giải mã bytecode vào tính toàn vẹn source của interpreter |
-| `debugProtection` | Chống debugger đa tầng, phản ứng leo thang dần |
-| `vmShielding` | Micro-interpreter riêng cho từng hàm, xáo trộn opcode độc lập |
-| `incrementalCipher` | Đưa việc giải mã instruction vào vòng dispatch của VM |
-| `semanticOpacity` | Opaque predicates, alias handler, đa dạng hoá kiểu mã hoá |
-| `observationResistance` | Âm thầm làm hỏng kết quả tính toán khi phát hiện instrumentation |
-| `encryptBytecode` | Mã hoá RC4 bằng khoá fingerprint của môi trường chạy |
+| `rollingCipher` | Position-dependent XOR encryption on every instruction |
+| `integrityBinding` | Bind bytecode decryption to interpreter source integrity |
+| `debugProtection` | Multi-layered anti-debugger with escalating response |
+| `vmShielding` | Per-function micro-interpreters with independent opcode shuffle |
+| `incrementalCipher` | Move instruction decryption into the VM dispatch loop |
+| `semanticOpacity` | Opaque predicates, handler aliasing, and encoding diversity |
+| `observationResistance` | Silent computation corruption when instrumentation detected |
+| `encryptBytecode` | RC4 encryption using an environment fingerprint key |
 
-### Nghiền mã (Obfuscation)
+### Obfuscation
 
-| Option | Mô tả |
+| Option | Description |
 |---|---|
-| `mixedBooleanArithmetic` | Thay phép toán số học/bitwise bằng biểu thức MBA |
-| `stackEncoding` | XOR-encode giá trị trên stack VM trong lúc chạy |
-| `deadCodeInjection` | Chèn chuỗi bytecode không thể tới ngay sau RETURN |
-| `handlerFragmentation` | Tách handler thành các mảnh đan xen nhau |
-| `stringAtomization` | Thay string literal bằng tra bảng đã mã hoá |
-| `blockPermutation` | Xáo trộn thứ tự basic block của bytecode |
-| `opcodeMutation` | Đột biến bảng handler lúc runtime qua opcode MUTATE |
-| `bytecodeScattering` | Tách bytecode thành mảnh trộn lẫn rải khắp output |
+| `mixedBooleanArithmetic` | Replace arithmetic/bitwise ops with MBA expressions |
+| `stackEncoding` | XOR-encode VM stack values during execution |
+| `deadCodeInjection` | Insert unreachable bytecode sequences after RETURN |
+| `handlerFragmentation` | Split handlers into interleaved fragments |
+| `stringAtomization` | Replace string literals with encoded table lookups |
+| `blockPermutation` | Shuffle bytecode basic block order |
+| `opcodeMutation` | Runtime handler table mutations via MUTATE opcodes |
+| `bytecodeScattering` | Split bytecode into mixed-type fragments scattered through output |
 
-### Tối ưu (Optimization)
+### Optimization
 
-| Option | Mô tả |
+| Option | Description |
 |---|---|
-| `preprocessIdentifiers` | Đổi tên identifier trước khi compile |
-| `dynamicOpcodes` | Lọc opcode handler không dùng khỏi interpreter |
-| `decoyOpcodes` | Tiêm các handler opcode giả giống thật |
-| `polymorphicDecoder` | Chuỗi phép toán byte ngẫu nhiên, đổi theo từng build |
-| `scatteredKeys` | Phân mảnh key material qua các tầng closure |
+| `preprocessIdentifiers` | Rename identifiers before compilation |
+| `dynamicOpcodes` | Filter unused opcode handlers from interpreter |
+| `decoyOpcodes` | Inject realistic fake opcode handlers |
+| `polymorphicDecoder` | Per-build random chain of reversible byte operations |
+| `scatteredKeys` | Fragment key materials across closure tiers |
 
-## Phân quyền theo gói
+## Plan gating
 
-API key chỉ cấp từ gói **Pro** trở lên, nên với key `tnvm_…` mọi preset và
-tuỳ biến đều mở:
+API keys are only issued from the **Pro** plan up, so any valid `tnvm_…` key
+unlocks every preset and all custom options:
 
-| Gói | Preset | Tuỳ biến option | Giới hạn / request |
+| Plan | Presets | Custom options | Max request size |
 |---|---|:---:|---|
-| Ẩn danh (web) | low, medium | ✗ | 128KB |
+| Anonymous (web) | low, medium | ✗ | 128KB |
 | Free | low, medium | ✗ | 268KB |
 | **Pro** | low, medium, max | ✓ | 1MB |
-| Team / Business | low, medium, max | ✓ + hàng đợi ưu tiên | 3MB |
+| Team / Business | low, medium, max | ✓ + priority queue | 3MB |
 
 ## API
 
 ### `new VmCode({ apiKey, baseUrl, pollMs, timeoutMs, gzip })`
 
-| Option | Default | Ghi chú |
+| Option | Default | Note |
 |---|---|---|
-| `apiKey` | — | **bắt buộc**, `tnvm_…` (Pro+) |
-| `baseUrl` | `https://JsVM.MMO69.Com` | đổi khi chạy server local |
-| `pollMs` | `1000` | nhịp poll kết quả |
-| `timeoutMs` | `600000` | thời gian chờ tối đa của `protect()` (preset `max` file nhiều hàm có thể mất vài phút) |
-| `gzip` | `true` | nén gzip request > 1KB |
+| `apiKey` | — | **required**, `tnvm_…` (Pro+) |
+| `baseUrl` | `https://JsVM.MMO69.Com` | change for a local server |
+| `pollMs` | `1000` | result polling interval |
+| `timeoutMs` | `600000` | max wait of `protect()` (preset `max` on many-function files can take minutes) |
+| `gzip` | `true` | gzip requests > 1KB |
 
-### Phương thức
+### Methods
 
-| Phương thức | Trả về |
+| Method | Returns |
 |---|---|
-| `vm.protect(code, options?, callOpts?)` | `{ result, elapsed, usage? }` — submit + tự poll tới khi xong |
-| `vm.submit(code, options?)` | `{ taskId, status: 'pending' }` — tạo task, giữ `taskId` |
+| `vm.protect(code, options?, callOpts?)` | `{ result, elapsed, usage? }` — submits and polls until done |
+| `vm.submit(code, options?)` | `{ taskId, status: 'pending' }` — creates the task, keep the `taskId` |
 | `vm.poll(taskId)` | `{status:'pending'\|'running'}` \| `done{result,elapsed,usage}` \| `error{error}` \| `gone` |
-| `vm.meta()` | `{ options, presets, plans, … }` từ `/api/meta` |
+| `vm.meta()` | `{ options, presets, plans, … }` from `/api/meta` |
 
-`callOpts` = `{ pollMs, timeoutMs }` đè cấu hình constructor cho 1 lần gọi.
+`callOpts` = `{ pollMs, timeoutMs }` overrides the constructor config for a
+single call.
 
-**Kết quả chỉ lấy được MỘT LẦN** — poll nhận `done` xong task bị xoá; task
-không ai lấy sẽ hết hạn sau 2 giờ. Queue-friendly: `submit()` xong có thể
-làm việc khác, `poll()` khi cần.
+**The result can be fetched only ONCE** — after a `done` poll the task is
+deleted; unclaimed tasks expire after 2 hours. Queue-friendly: after
+`submit()` you can do other work and `poll()` whenever you're ready.
 
 ### `VmError`
 
-Mọi lỗi đều throw `VmError` — `err.code` khớp mã lỗi API:
+Every failure throws a `VmError` — `err.code` matches the API error codes:
 `size` `options_locked` `quota` `rate` `engine` `task` `timeout` `network` …
-(`err.status` = HTTP status, `0` = lỗi mạng/timeout phía SDK).
-`protect()` timeout thì message kèm sẵn `taskId` để poll thủ công tiếp.
+(`err.status` = HTTP status, `0` = network/timeout error on the SDK side).
+On `protect()` timeout the message already includes the `taskId` so you can
+resume polling manually.

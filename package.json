@@ -10,7 +10,7 @@
   "files": [
     "index.mjs",
     "README.md",
-    "README_EN.md"
+    "README_VI.md"
   ],
   "engines": {
     "node": ">=18"
