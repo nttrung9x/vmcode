@@ -24,10 +24,10 @@ export class VmCode {
    * @param {string}  opts.apiKey     tnvm_… API key (required — Pro plan or higher)
    * @param {string} [opts.baseUrl]   default https://JsVM.MMO69.Com (change for local/dev)
    * @param {number} [opts.pollMs]    result polling interval (default 1000)
-   * @param {number} [opts.timeoutMs] max wait of protect() (default 10 minutes)
+   * @param {number} [opts.timeoutMs] max wait of protect() (default 21 minutes — the server compiles max-size files up to 20 min)
    * @param {boolean} [opts.gzip]     gzip requests > 1KB (default true)
    */
-  constructor({ apiKey, baseUrl, pollMs = 1000, timeoutMs = 10 * 60_000, gzip = true } = {}) {
+  constructor({ apiKey, baseUrl, pollMs = 1000, timeoutMs = 21 * 60_000, gzip = true } = {}) {
     if (!apiKey) throw new VmError('Missing apiKey (tnvm_…) — create one at /client/apikeys.html (Pro plan+)', 'apikey');
     this.apiKey = String(apiKey);
     this.base = String(baseUrl || DEFAULT_BASE).replace(/\/+$/, '');

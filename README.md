@@ -72,10 +72,10 @@ console.log(result); // protected code — runs exactly like the original
 
 - **`low`** *(default)* — fastest, only `dynamicOpcodes`: plain VM bytecode,
   compact output. A 122KB file takes ~a few hundred ms.
-- **`medium`** — balanced: 9/21 options on. A 122KB file takes ~3s.
-- **`max`** — all 21 options. Strongest but slow — **cost scales with
-  FUNCTION COUNT**; a many-function file (800+) can take minutes — raise
-  `timeoutMs` when using it.
+- **`medium`** — balanced: 9/21 options on. Roughly ~1s per MB of source.
+- **`max`** — all 21 options. Strongest but slow — cost scales with
+  **function count and file size** (~6–7s per MB): a 3MB file takes ~20s,
+  a 20MB file can take several minutes — `timeoutMs` (21 min) already covers it.
 
 **Auto-enable** (the engine turns these on by itself, no need to declare):
 enabling `integrityBinding` / `vmShielding` / `opcodeMutation` /
@@ -157,8 +157,9 @@ unlocks every preset and all custom options:
 |---|---|:---:|---|
 | Anonymous (web) | low, medium | ✗ | 128KB |
 | Free | low, medium | ✗ | 268KB |
-| **Pro** | low, medium, max | ✓ | 1MB |
-| Team / Business | low, medium, max | ✓ + priority queue | 3MB |
+| **Pro** | low, medium, max | ✓ | 5MB |
+| Team | low, medium, max | ✓ + priority queue | 12MB |
+| Business | low, medium, max | ✓ + priority queue | 20MB |
 
 ## API
 
@@ -169,7 +170,7 @@ unlocks every preset and all custom options:
 | `apiKey` | — | **required**, `tnvm_…` (Pro+) |
 | `baseUrl` | `https://JsVM.MMO69.Com` | change for a local server |
 | `pollMs` | `1000` | result polling interval |
-| `timeoutMs` | `600000` | max wait of `protect()` (preset `max` on many-function files can take minutes) |
+| `timeoutMs` | `1260000` | max wait of `protect()` — the server compiles max-size files up to 20 min, default 21 min covers it |
 | `gzip` | `true` | gzip requests > 1KB |
 
 ### Methods

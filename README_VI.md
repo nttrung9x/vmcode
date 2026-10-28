@@ -72,9 +72,10 @@ console.log(result); // mã đã bảo vệ — chạy y hệt bản gốc
 
 - **`low`** *(mặc định)* — nhanh nhất, chỉ `dynamicOpcodes`: bytecode VM thuần,
   output gọn. File 122KB ~vài trăm ms.
-- **`medium`** — cân bằng: 9/21 option bật. File 122KB ~3s.
-- **`max`** — tất cả 21 option. Mạnh nhất nhưng chậm — **thời gian tăng theo
-  SỐ HÀM**, file nhiều hàm (800+) có thể mất vài phút; tăng `timeoutMs` khi dùng.
+- **`medium`** — cân bằng: 9/21 option bật. Tốc độ ~1 giây mỗi MB mã nguồn.
+- **`max`** — tất cả 21 option. Mạnh nhất nhưng chậm — thời gian tăng theo
+  **số hàm lẫn size file** (~6–7 giây mỗi MB): file 3MB ~20 giây,
+  file 20MB có thể mất vài phút — `timeoutMs` mặc định 21 phút đã đủ.
 
 **Auto-enable** (engine tự bật kèm, không cần khai báo):
 bật `integrityBinding` / `vmShielding` / `opcodeMutation` / `incrementalCipher` /
@@ -156,8 +157,9 @@ tuỳ biến đều mở:
 | --------------- | ---------------- | :------------------------: | -------------------- |
 | Ẩn danh (web)  | low, medium      |             ✗             | 128KB                |
 | Free            | low, medium      |             ✗             | 268KB                |
-| **Pro**   | low, medium, max |             ✓             | 1MB                  |
-| Team / Business | low, medium, max | ✓ + hàng đợi ưu tiên | 3MB                  |
+| **Pro**   | low, medium, max |             ✓             | 5MB                  |
+| Team            | low, medium, max | ✓ + hàng đợi ưu tiên | 12MB                 |
+| Business        | low, medium, max | ✓ + hàng đợi ưu tiên | 20MB                 |
 
 ## API
 
@@ -168,7 +170,7 @@ tuỳ biến đều mở:
 | `apiKey`    | —                         | **bắt buộc**, `tnvm_…` (Pro+)                                                               |
 | `baseUrl`   | `https://JsVM.MMO69.Com` | đổi khi chạy server local                                                                           |
 | `pollMs`    | `1000`                   | nhịp poll kết quả                                                                                   |
-| `timeoutMs` | `600000`                 | thời gian chờ tối đa của `protect()` (preset `max` file nhiều hàm có thể mất vài phút) |
+| `timeoutMs` | `1260000`                 | thời gian chờ tối đa của `protect()` — server compile file cỡ lớn tối đa 20 phút, mặc định 21 phút là đủ |
 | `gzip`      | `true`                   | nén gzip request > 1KB                                                                                |
 
 ### Phương thức

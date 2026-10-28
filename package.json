@@ -1,6 +1,6 @@
 {
   "name": "@mmo69/vmcode",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "NodeJS SDK for the JsVM.MMO69.Com VMCode API — protect JavaScript with server-side TNVM VM bytecode (async task: submit → taskId → poll).",
   "type": "module",
   "main": "index.mjs",
