@@ -16,14 +16,14 @@ to the browser.
 ## Install
 
 ```bash
-npm i vmcode
+npm i @mmo69/vmcode
 # or just copy index.mjs — the whole library is a single file
 ```
 
 ## Quick start
 
 ```js
-import { VmCode } from 'vmcode';
+import { VmCode } from '@mmo69/vmcode';
 import fs from 'node:fs';
 
 const vm = new VmCode({ apiKey: 'tnvm_YOUR_KEY' });

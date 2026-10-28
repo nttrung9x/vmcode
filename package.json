@@ -1,11 +1,15 @@
 {
-  "name": "vmcode",
+  "name": "@mmo69/vmcode",
   "version": "1.0.0",
   "description": "NodeJS SDK for the JsVM.MMO69.Com VMCode API — protect JavaScript with server-side TNVM VM bytecode (async task: submit → taskId → poll).",
   "type": "module",
   "main": "index.mjs",
   "exports": {
     ".": "./index.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nttrung9x/vmcode.git"
   },
   "files": [
     "index.mjs",

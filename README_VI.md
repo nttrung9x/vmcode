@@ -16,14 +16,14 @@ trình duyệt.
 ## Cài đặt
 
 ```bash
-npm i vmcode
+npm i @mmo69/vmcode
 # hoặc chỉ copy index.mjs — cả thư viện gói gọn trong 1 file
 ```
 
 ## Dùng nhanh
 
 ```js
-import { VmCode } from 'vmcode';
+import { VmCode } from '@mmo69/vmcode';
 import fs from 'node:fs';
 
 const vm = new VmCode({ apiKey: 'tnvm_CUA_BAN' });
